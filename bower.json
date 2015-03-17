@@ -1,0 +1,18 @@
+{
+  "name": "quiz-pagemon",
+  "version": "0.0.0",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-material-design": "~0.2.2",
+    "bootstrap.css": "~2.3.2",
+    "polymer": "Polymer/polymer#~0.5.5",
+    "core-ajax": "Polymer/core-ajax#~0.5.5"
+  }
+}
