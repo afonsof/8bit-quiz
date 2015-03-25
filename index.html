@@ -4,9 +4,36 @@
     <script src="bower_components/jquery/dist/jquery.js"></script>
 </head>
 <script src="script.js"></script>
-<body>
+<style>
+    img{
+        width: 50%;
+    }
+    div{
+        display: none;
+        position: absolute;
+        text-align: center;
+        background-color: white;
+        left:0;
+        top:0;
+        right: 0;
+        bottom: 0;
+    }
+    #answer{
+        position: relative;
+        background-color: red;
+        margin: 0 auto;
+        width: 300px;
+        margin-top: 200px;
+    }
+</style>
 
-<div id="images"></div>
+<body>
+<div id="pressStart">
+    <h1>Pressione qualquer tecla para comecar!</h1>
+</div>
+<div id="question"></div>
+<div id="answer"></div>
+<div id="result"></div>
 
 
 </body>
