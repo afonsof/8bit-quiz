@@ -26,18 +26,18 @@ var PRESS_START = 1,
 
 var questions = [{
     images: ['images/question1/img1.jpg', 'images/question1/img2.jpg'],
+    realImage: IMAGE_A
+}, {
+    images: ['images/question2/img1.jpg', 'images/question2/img2.jpg'],
+    realImage: IMAGE_A
+}, {
+    images: ['images/question3/img1.jpg', 'images/question3/img2.jpg'],
     realImage: IMAGE_B
 }, {
-    images: ['images/question1/img1.jpg', 'images/question1/img2.jpg'],
-    realImage: IMAGE_B
+    images: ['images/question4/img1.jpg', 'images/question4/img2.jpg'],
+    realImage: IMAGE_A
 }, {
-    images: ['images/question1/img1.jpg', 'images/question1/img2.jpg'],
-    realImage: IMAGE_B
-}, {
-    images: ['images/question1/img1.jpg', 'images/question1/img2.jpg'],
-    realImage: IMAGE_B
-}, {
-    images: ['images/question1/img1.jpg', 'images/question1/img2.jpg'],
+    images: ['images/question5/img1.jpg', 'images/question5/img2.jpg'],
     realImage: IMAGE_B
 }];
 
