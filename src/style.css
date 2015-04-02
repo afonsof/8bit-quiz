@@ -1,0 +1,74 @@
+
+@font-face {
+    font-family: 'Press Start 2P';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Press Start 2P'), local('PressStart2P-Regular'), url(../fonts/PressStart2P-Regular.woff2) format('woff2');
+}
+
+body {
+    background-color: black;
+    margin: 0 auto;
+    font-family: "Press Start 2P",serif;
+}
+
+.option {
+    width: 50%;
+}
+
+section {
+    display: none;
+    position: absolute;
+    text-align: center;
+    background-color: white;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#answer {
+    position: relative;
+    background-color: red;
+    margin: 0 auto;
+    width: 300px;
+    margin-top: 200px;
+}
+
+table {
+    margin: 0 auto;
+}
+
+.abs {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.thumb {
+    position: absolute;
+    top: 338px;
+    background-color: yellow;
+    display: none;
+    z-index: 1;
+}
+
+video {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+    -moz-transform: rotateY(180deg); /* Firefox */
+    position: absolute;
+    left: 240px;
+    top: 0;
+}
+
+canvas{
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    transform: scale(-1, 1);
+}
+
+#score img{
+    border-radius: 50%;
+}
