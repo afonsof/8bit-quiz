@@ -10,7 +10,7 @@ module.exports = function (grunt) {
         typescript: {
             base: {
                 src: ['src/*.ts'],
-                dest: 'dist',
+                dest: 'dist/script.js',
                 options: {
                     module: 'amd',
                     target: 'es5',
