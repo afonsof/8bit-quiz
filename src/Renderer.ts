@@ -5,10 +5,10 @@ class Renderer {
 
     private players;
 
-    public render(quizStatus, question, result, questionId, answerQuestionTimeout) {
+    public render(quizManager:QuizManager, callback) {
         var $answerSection = $('#answer');
 
-        switch (quizStatus) {
+        switch (quizManager.status.quizStatus) {
             case QuizStatusEnum.PRESS_START:
                 Renderer.renderPressStart();
                 break;
@@ -16,10 +16,10 @@ class Renderer {
                 Renderer.renderSelectPlayer(this.players);
                 break;
             case QuizStatusEnum.QUESTION:
-                Renderer.renderQuestion($answerSection, this.players, question, questionId);
+                Renderer.renderQuestion($answerSection, this.players, quizManager);
                 break;
             case QuizStatusEnum.ANSWER:
-                Renderer.renderAnswer($answerSection, this.players, result, answerQuestionTimeout);
+                Renderer.renderAnswer($answerSection, this.players, quizManager, callback);
                 break;
             case QuizStatusEnum.RESULT:
                 Renderer.renderResult($answerSection, this.players);
@@ -27,7 +27,11 @@ class Renderer {
     }
 
     private static renderPressStart() {
+        $("#question").hide();
+        $("#answer").hide();
+        $("#selectPlayer").hide();
         $("#result").hide();
+        $(".thumb").hide();
         $("#pressStart").fadeIn("slow");
     }
 
@@ -35,24 +39,25 @@ class Renderer {
         $("#pressStart").fadeOut();
         $("#selectPlayer").fadeIn("slow");
         if (players[0].image) {
-            $('#thumb0').show();
+            $('#thumb0').fadeIn('slow');
         }
         if (players[1].image) {
-            $('#thumb1').show();
+            $('#thumb1').fadeIn('slow');
         }
     }
 
-    private static renderQuestion($answerSection, players, question, questionId) {
+    private static renderQuestion($answerSection, players, quizManager:QuizManager) {
         $("#selectPlayer").fadeOut(3000);
         $answerSection.hide();
         Renderer.renderScore(players);
-        Renderer.printQuestion(question, questionId);
+        Renderer.printQuestion(quizManager.status.question, quizManager.status.questionId);
         $("#question").fadeIn(3000);
     }
 
-    private static renderAnswer($answerSection, players, result, answerQuestionTimeout) {
+    private static renderAnswer($answerSection, players, quizManager:QuizManager, answerQuestionTimeout) {
         //todo: Resolver: quizStatus = QuizStatusEnum.ANIMATING;
-        $answerSection.html("<h1>Player " + players[result.player].name + " " + (result.match ? "acertou" : "errou") + "!</h1>");
+        $answerSection.html("<h1>Player " + players[quizManager.status.currentPlayerId].name + " " +
+        (quizManager.status.isMatch ? "acertou" : "errou") + "!</h1>");
         $answerSection.slideDown("slow", function () {
             setTimeout(answerQuestionTimeout, 3000);
         });

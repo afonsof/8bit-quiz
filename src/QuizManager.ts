@@ -1,113 +1,120 @@
+class QuizStatus {
+    questionId:number;
+    question:Question;
+    currentPlayerId:number;
+    isMatch;
+    quizStatus:QuizStatusEnum;
+    gameQuestions:Question[];
+}
+
 class QuizManager {
-    private players:Player[];
-    private questions:Question[];
 
-    private quizStatus:QuizStatusEnum = QuizStatusEnum.PRESS_START;
-    private questionId:number = 0;
-    private question:Question;
-    private result;
-
-    private renderer:Renderer;
-    private videoHandler:VideoHandler;
-
-
-    constructor(players:Player[], questions:Question[], renderer:Renderer, videoHandler:VideoHandler) {
-        this.renderer = renderer;
-        this.players = players;
-        this.questions = questions;
-        this.videoHandler = videoHandler;
-
-        this.players[0][this.players[0].buttonA] = 0;
-        this.players[0][this.players[0].buttonB] = 1;
-        this.players[1][this.players[1].buttonA] = 0;
-        this.players[1][this.players[1].buttonB] = 1;
+    constructor(public status:QuizStatus,
+                private players:Player[],
+                private questions:Question[],
+                private questionCount:number,
+                private renderer:Renderer,
+                private videoHandler:VideoHandler,
+                private joystick:Joystick) {
     }
 
-    ready() {
-        this.render();
-        this.bindKeydown();
+    turnOn() {
         this.videoHandler.bindVideo();
-    }
+        this.joystick.bind((playerId:PlayersEnum, button:JoystickButtonsEnum) => {
 
-    private render() {
-        var _this = this;
-        this.renderer.render(this.quizStatus, this.question, this.result, this.questionId, function () {
-            _this.question = _this.questions[_this.questionId];
-            _this.questionId++;
-            if (_this.question) {
-                _this.quizStatus = QuizStatusEnum.QUESTION;
-            } else {
-                _this.quizStatus = QuizStatusEnum.RESULT;
+            if(button == JoystickButtonsEnum.ButtonReset){
+                this.resetGame();
+                return;
             }
-            _this.render();
-        });
 
-    }
-
-    private bindKeydown() {
-        var _this = this;
-
-        $(window).on("keydown", function (key) {
-            if (_this.quizStatus == QuizStatusEnum.PRESS_START) {
-                _this.quizStatus = QuizStatusEnum.SELECT_PLAYER;
-                _this.render();
-
-            } else if (_this.quizStatus == QuizStatusEnum.SELECT_PLAYER) {
-                for(var i = 0; i < 2; i++) {
-                    if (key.keyCode == _this.players[i].buttonA || key.keyCode == _this.players[i].buttonB) {
-                        _this.players[i].image = _this.videoHandler.snapPlayer(i);
-                    }
-                }
-                _this.render();
-
-                if (_this.players[0].image && _this.players[1].image) {
-                    _this.quizStatus = QuizStatusEnum.QUESTION;
-                    _this.question = _this.questions[_this.questionId];
-                    _this.questionId++;
-                }
-                _this.render();
-            } else if (_this.quizStatus == QuizStatusEnum.QUESTION) {
-                _this.result = _this.getResult(_this.question, key.keyCode);
-                if (_this.result) {
-                    _this.quizStatus = QuizStatusEnum.ANSWER;
-
-                    var otherPlayer = 1 - _this.result.player;
-                    if (_this.result.match) {
-                        _this.players[_this.result.player].score++;
-                    } else {
-                        _this.players[otherPlayer].score++;
-                    }
-                    _this.render();
-                }
-            } else if (_this.quizStatus == QuizStatusEnum.RESULT) {
-                _this.quizStatus = QuizStatusEnum.PRESS_START;
-                _this.players.forEach(function (player:Player) {
-                    player.score = 0;
-                });
-                _this.questionId = 0;
-                _this.render();
+            this.status.currentPlayerId = playerId;
+            switch (this.status.quizStatus) {
+                case QuizStatusEnum.PRESS_START:
+                    this.startGame();
+                    break;
+                case QuizStatusEnum.SELECT_PLAYER:
+                    this.selectPlayer(playerId);
+                    break;
+                case QuizStatusEnum.QUESTION:
+                    this.processAnswer(playerId, button);
+                    break;
+                case QuizStatusEnum.RESULT:
+                    this.resetGame();
             }
         });
-
+        this.resetGame();
     }
 
-    private getResult(question, key) {
-        var playerId = this.getPlayer(key);
+    private render(callback?:any) {
+        this.renderer.render(this, callback);
+    }
+
+    private startGame():void {
+        this.status.quizStatus = QuizStatusEnum.SELECT_PLAYER;
+        this.render();
+    }
+
+    private selectPlayer(playerId:PlayersEnum):void {
         if (playerId === undefined) {
-            return null;
+            return;
         }
-        if (this.players[playerId][key] == question.realImage) {
-            return {player: playerId, match: true};
-        } else {
-            return {player: playerId, match: false};
+        this.players[playerId].image = this.videoHandler.snapPlayer(playerId);
+        this.render({currentPlayerId: playerId});
+
+        if (this.players[0].image && this.players[1].image) {
+            this.processNextQuestion();
         }
     }
 
-    private getPlayer(key) {
-        for (var i = 0; i < this.players.length; i++) {
-            if (this.players[i][key] !== undefined) {
-                return i;
-            }
+    private resetGame():void {
+        this.status.quizStatus = QuizStatusEnum.PRESS_START;
+        this.status.questionId = 0;
+        this.players.forEach(function (player:Player) {
+            player.score = 0;
+            player.image = null;
+        });
+        var temp = this.questions.slice(0);
+        this.status.gameQuestions = [];
+
+        for (var i = 0; i < this.questionCount; i++) {
+            this.status.gameQuestions.push(temp.splice(Math.floor(Math.random() * temp.length), 1)[0]);
         }
+        this.render();
+    }
+
+    private processAnswer(playerId:PlayersEnum, button:JoystickButtonsEnum):void {
+        if (playerId === undefined) {
+            return;
+        }
+        this.status.isMatch = QuizManager.IsMatch(this.status.question, button);
+        this.status.quizStatus = QuizStatusEnum.ANSWER;
+
+        var otherPlayer = 1 - playerId;
+        if (this.status.isMatch) {
+            this.players[playerId].score++;
+        } else {
+            this.players[otherPlayer].score++;
+        }
+        this.render(() => {
+            this.processNextQuestion();
+        });
+
+    }
+
+    private processNextQuestion():void {
+        this.status.question = this.status.gameQuestions[this.status.questionId];
+        this.status.questionId++;
+        if (this.status.question) {
+            this.status.quizStatus = QuizStatusEnum.QUESTION;
+        } else {
+            this.status.quizStatus = QuizStatusEnum.RESULT;
+        }
+        this.render();
+    }
+
+    private static IsMatch(question, button:JoystickButtonsEnum):boolean {
+        return !!
+            (button === JoystickButtonsEnum.ButtonA && question.realImage === ImagesEnum.IMAGE_A ||
+            button === JoystickButtonsEnum.ButtonB && question.realImage === ImagesEnum.IMAGE_B);
     }
 }
