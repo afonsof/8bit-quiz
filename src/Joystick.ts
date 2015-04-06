@@ -29,7 +29,7 @@ class Joystick {
     public bind(callback) {
         $(window).on("keydown", (key) => {
             var button:JoystickButtonsEnum = this.buttons[key.keyCode];
-            if(button){
+            if(button !== undefined){
                 var playerId:PlayersEnum = this.players[key.keyCode];
                 callback(playerId, button);
             }
