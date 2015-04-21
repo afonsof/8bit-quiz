@@ -1,0 +1,379 @@
+$pixel-size: 3;
+$screen-width: 640px * $pixel-size;
+$screen-height: 360px * $pixel-size;
+
+@mixin mirror() {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+}
+
+@mixin transition($interval) {
+  -webkit-transition: all $interval;
+  transition: all $interval;
+}
+
+* {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -o-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  -ms-interpolation-mode: nearest-neighbor;
+  image-rendering: pixelated;
+
+  ﻿font-smooth: never;
+  -webkit-font-smoothing: none;
+}
+
+@font-face {
+  font-family: 'Press Start 2P';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Press Start 2P'), local('PressStart2P-Regular'), url(../fonts/PressStart2P-Regular.woff2) format('woff2');
+}
+
+@-webkit-keyframes blinker {
+  0% {
+    opacity: 1.0;
+  }
+  30% {
+    opacity: 1.0;
+  }
+  to {
+    opacity: 0.0;
+  }
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+.quiz {
+  overflow: hidden;
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+  }
+
+  position: relative;
+  background-image: url(images/bg2.png);
+  background-size: 100%;
+
+  color: white;
+  width: $screen-width;
+  height: $screen-height;
+  font-family: "Press Start 2P", serif;
+
+  section {
+    text-align: center;
+  }
+
+  #pressStart {
+    @include transition(1s);
+    opacity: 0;
+
+    div {
+      @include transition(0.5s);
+      transition-timing-function: ease-in;
+      transition-delay: 1s;
+      position: absolute;
+      top: -180px * $pixel-size;
+      width: 100%;
+
+      img {
+        width: 306px * $pixel-size;
+      }
+    }
+
+    h1 {
+      -webkit-animation-name: blinker;
+      -webkit-animation-iteration-count: infinite;
+      -webkit-animation-duration: 1.5s;
+
+      color: #ececce;
+      text-transform: uppercase;
+      font-size: 16px * $pixel-size;
+
+      position: absolute;
+      top: 280px * $pixel-size;
+      width: 100%;
+    }
+
+    h2 {
+      text-transform: uppercase;
+      font-size: 8px * $pixel-size;
+      position: absolute;
+      top: 330px * $pixel-size;
+      width: 100%;
+    }
+
+    &.show {
+      opacity: 1;
+
+      div{
+        top: 50px * $pixel-size;
+      }
+
+    }
+  }
+
+  #selectPlayer {
+    @include transition(2s);
+    opacity: 0;
+
+    &.show {
+      opacity: 1;
+    }
+
+    canvas {
+      -moz-transform: scale(-1, 1);
+      -webkit-transform: scale(-1, 1);
+      -o-transform: scale(-1, 1);
+      transform: scale(-1, 1);
+    }
+
+    canvas:first-of-type {
+      left: 455px;
+    }
+    canvas:last-child {
+      left: 1060px;
+    }
+
+    video {
+      @include mirror();
+      height: $screen-height;
+      width: $screen-width * 0.75;
+      position: absolute;
+      top: 0;
+      left: ($screen-width - ($screen-width * 0.75))/2;
+    }
+
+    #overlay {
+      z-index: 2;
+      position: absolute;
+      width: $screen-width;
+      left: 0;
+      top: 0;
+    }
+    .thumb {
+      position: absolute;
+      top: 338px;
+      background-color: yellow;
+      display: none;
+      z-index: 1;
+    }
+  }
+
+  #question {
+    @include transition(2s);
+    opacity: 0;
+
+    &.show {
+      opacity: 1;
+    }
+  }
+
+  #questions {
+    $image-width: 279px * $pixel-size;
+
+    .question {
+      width: $image-width;
+      height: 227px * $pixel-size;
+      position: absolute;
+      top: 100px * $pixel-size;
+      left: 0;
+      background-size: 100% 100%;
+
+      &.hide {
+        left: -$image-width;
+      }
+
+      &:last-of-type {
+        right: 0;
+        left: auto;
+        &.hide {
+          right: -$image-width;
+        }
+        .box {
+          @include mirror();
+        }
+        .button{
+          right: auto;
+          left: 6px * $pixel-size;
+        }
+      }
+      @include transition(1s);
+    }
+
+    .box {
+      width: 279px * $pixel-size;
+    }
+
+    .button{
+      width: 37px * $pixel-size;
+      position: absolute;
+      right: 6px * $pixel-size;
+      top: 188px * $pixel-size;
+    }
+  }
+
+  #answer {
+    $answer-width: 400px * $pixel-size;
+    $answer-height: 200px * $pixel-size;
+
+    background-color: red;
+    width: $answer-width;
+    height: $answer-height;
+
+    position: absolute;
+    left: ($screen-width/2)-($answer-width/2);
+    top: $screen-height;
+
+    @include transition(1s);
+
+    &.show {
+      top: ($screen-height/2)-($answer-height/2);
+    }
+
+  }
+
+  $boxSize: 72px * $pixel-size;
+  $life-width: 200px * $pixel-size;
+  $life-height: 20px * $pixel-size;
+  $life-padding: 4px * $pixel-size;
+
+  @mixin box() {
+    width: $boxSize;
+    height: $boxSize;
+    background-size: $boxSize $boxSize;
+  }
+
+  #score {
+    height: $boxSize;
+    font-size: 16px * $pixel-size;
+    background: url(images/vs.png) center 7px * $pixel-size no-repeat;
+    background-size: 88px * $pixel-size;
+
+    .player-score {
+      position: relative;
+      width: 50%;
+      float: left;
+
+      div {
+        float: left;
+        text-align: right;
+      }
+
+      .life {
+        background-image: url(images/life-bar.png);
+        background-size: $life-width $life-height;
+        width: $life-width - $life-padding * 2;
+        height: $life-height - $life-padding * 2;
+        padding: $life-padding;
+
+        > div {
+          position: relative;
+          width: 100%;
+
+          > div {
+            background-color: #f80000;
+            height: $life-height - $life-padding * 2;
+            @include transition(1s);
+            position: absolute;
+            top: 0;
+            transition-delay: 0.2s;
+          }
+
+          > div:last-child {
+            background-color: #EBC84F;
+            transition: none;
+          }
+
+          .life-1 {
+            width: 20%;
+          }
+          .life-2 {
+            width: 40%;
+          }
+          .life-3 {
+            width: 60%;
+          }
+          .life-4 {
+            width: 80%;
+          }
+          .life-5 {
+            width: 100%;
+          }
+        }
+      }
+
+      .score, .name {
+        margin: 2px * $pixel-size 0 1px * $pixel-size;
+        text-transform: uppercase;
+        color: #d0f0f0;
+        width: 182px * $pixel-size;
+      }
+
+      .name {
+        position: relative;
+        div {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+        }
+        .text {
+          background: url(images/player-name-bg.png) repeat-x top left;
+          color: #fff;
+          -webkit-text-fill-color: transparent;
+          -webkit-background-clip: text;
+          background-size: 16px * $pixel-size;
+        }
+
+        .shadow {
+          -webkit-text-fill-color: transparent;
+          -webkit-text-shadow: 1px * $pixel-size 1px * $pixel-size 0 #000068;
+          -moz-text-shadow: 1px * $pixel-size 1px * $pixel-size 0 #000068;
+          text-shadow: 1px * $pixel-size 1px * $pixel-size 0 #000068;
+        }
+
+      }
+
+      .box {
+        @include box();
+        background-image: url('images/player-box.png');
+      }
+
+      .avatar {
+        @include box();
+        margin-right: 22px * $pixel-size;
+      }
+
+      &:last-of-type {
+        float: right;
+        .box {
+          @include mirror();
+        }
+        div {
+          float: right;
+          text-align: left;
+        }
+        .life-bar {
+          right: 0;
+        }
+        .avatar {
+          margin-right: 0;
+          margin-left: 22px * $pixel-size;
+        }
+      }
+    }
+  }
+
+}
+
+
+
+
+
+
+
+

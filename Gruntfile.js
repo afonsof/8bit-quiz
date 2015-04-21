@@ -7,6 +7,17 @@ module.exports = function (grunt) {
             'path': 'app'
         },
 
+        sass: {
+            dist: {
+                options: {
+                    style: 'expanded'
+                },
+                files: {
+                    'dist/style.css': 'src/style.scss'
+                }
+            }
+        },
+
         typescript: {
             base: {
                 src: ['src/*.ts'],
@@ -33,5 +44,5 @@ module.exports = function (grunt) {
 
 
     });
-    grunt.registerTask('default', ['typescript', 'copy']);
+    grunt.registerTask('default', ['sass', 'typescript', 'copy']);
 };
